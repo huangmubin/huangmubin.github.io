@@ -3,6 +3,7 @@ import Foundation
 // MARK: - Blog Tool Info
 
 public class BlogTool: NSObject {
+    public var infos: (folder: String, index: String, file: String) = ("","","")
     public var path: (home: String, draft: String, index: String, save: String) = ("","","","")
     public var tips: [String] = []
     public var name: String = ""
@@ -24,8 +25,7 @@ public class BlogTool: NSObject {
     public func draftAnalysis() -> Bool {
         if let text = readFile(path.draft) {
             // 解析头
-            path.index = path.home + "/"
-            path.save = path.index
+            infos = ("","","")
             name.removeAll(keepCapacity: true)
             tips.removeAll(keepCapacity: true)
             
@@ -41,36 +41,48 @@ public class BlogTool: NSObject {
                     if c == "\n" {
                         level = 2
                     } else {
-                        path.index.append(c)
+                        infos.folder.append(c)
                     }
                 case 2:
                     if c == "\n" {
                         level = 3
                     } else {
-                        path.save.append(c)
+                        infos.index.append(c)
                     }
                 case 3:
                     if c == "\n" {
                         level = 4
                     } else {
-                        name.append(c)
+                        infos.file.append(c)
                     }
                 case 4:
                     if c == "\n" {
                         level = 5
+                    } else {
+                        name.append(c)
+                    }
+                case 5:
+                    if c == "\n" {
+                        level = 6
                     } else if c == "#" {
                         tips.append(tip)
                         tip.removeAll(keepCapacity: true)
                     } else {
                         tip.append(c)
                     }
-                case 5:
+                case 6:
+                    // 拼接路径
+                    path.index = path.home + "/" + infos.folder + "/" + infos.index
+                    path.save = path.home + "/" + infos.folder + "/" + infos.file
+                    
                     // 修改和保存
-                    if let range = regex2(text, pattern: "<title>Myron Blog</title>") {
+                    if let range = regex2(text, pattern: "<title>Myron Blog</title>"), let link = regex2(text, pattern: "<a id=\"The Index File\" href=\"\"></a>") {
                         blog.removeAll(keepCapacity: true)
                         blog = text.sub(0, end: range.start)
                         blog += "<title>\(name)</title>"
-                        blog += text.sub(range.end, end: text.characters.count)
+                        blog += text.sub(range.end, end: link.start)
+                        blog += "<a id=\"The Index File\" href=\"\(infos.index)\">Back</a>"
+                        blog += text.sub(link.end, end: text.characters.count)
                         return saveFile(blog, path: path.save)
                     } else {
                         return false
@@ -84,7 +96,19 @@ public class BlogTool: NSObject {
     }
     
     // MARK: 解析目录文件并进行更新
-    
+    public func indexAnalysis() -> Bool {
+        if let text = readFile(path.index) {
+            var update = ""
+            if let range = regex2(text, pattern: "<!-- -Add- -->") {
+                update = text.sub(0, end: range.start)
+                update += "<p><a id=\"\(infos.file)\" href=\"\(infos.file)\">\(name)</a><p>\n\n<!-- -Add- -->"
+                update += text.sub(range.end, end: text.characters.count)
+                
+                return saveFile(update, path: path.index)
+            }
+        }
+        return false
+    }
     
     // MARK: 解析现有 Tips 记录获取
 }

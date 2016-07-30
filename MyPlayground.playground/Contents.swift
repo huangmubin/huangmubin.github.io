@@ -2,7 +2,8 @@
 
 import Cocoa
 
-let input = "/Users/Myron/MyronCodeNote/huangmubin.github.io/Draft.html"
+let input = "/Users/Myron/职业生涯文档/huangmubin.github.io/Draft.html"
+//let input = "/Users/Myron/MyronCodeNote/huangmubin.github.io/Draft.html"
 let blogTool = BlogTool()
 
 // 解析地址
@@ -18,7 +19,9 @@ if !blogTool.draftAnalysis() {
     print(blogTool.path)
 
 // 给目录文档插入新条目并更新
-
+if !blogTool.indexAnalysis() {
+    print("blogTool.draftAnalysis()")
+}
 
 print("Done")
 

@@ -28,7 +28,7 @@ disqus:
 # URL
 url:                "https://huangmubin.github.io"
 #url:               "localhost:4000"
-baseurl:            ""
+baseurl:            "https://huangmubin.github.io"
 
 
 # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones

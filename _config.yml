@@ -66,13 +66,13 @@ sass:
 defaults:
   -
     scope:
-      path:         ""
+      path:         "https://huangmubin.github.io"
       type:         "pages"
     values:
       layout:       "page"
   -
     scope:
-      path:         ""
+      path:         "https://huangmubin.github.io"
       type:         "posts"
     values:
       layout:       "post"

@@ -16,7 +16,7 @@ share: true
 
 假设一种很常见的场景：
 
-![](./images/notify002.jpeg)
+![](../images/notify002.jpeg)
 
 * TableView: 在这里扮演者 Controller 的角色。接收作为 View 的 Cell 发送过来的用户操作指令，进行数据操作，然后把数据保存到 Model 当中，再要求 Cell 更新视图。
 * Cell: 作为 View 存在，展示数据和动画。
@@ -28,7 +28,7 @@ share: true
 
 而如果使用通知中心，程序的结构就会变成这样：
 
-![](./images/notify001.jpeg)
+![](../images/notify001.jpeg)
 
 现在，他们三个的功能就会变成这样：
 
@@ -122,8 +122,8 @@ public func removeObserver(observer: Any, name aName: Notification.Name?, object
 * protocol NotifyProtocol 
 
 * extension NotifyProtocol 扩展协议并提供默认方法，这样一来只要准守该协议的类就自动拥有这个方法了。
-	* func observe(...) 添加监听
-	* func unobserve(...) 移除监听
+	* func observer(...) 添加监听
+	* func unobserver(...) 移除监听
 	* func post(...) 发送消息
 
 * class Notify 主类，用来帮忙解析 userInfos
@@ -146,13 +146,109 @@ public func removeObserver(observer: Any, name aName: Notification.Name?, object
 
 ## 代码
 
+```
+//
+//  Notify.swift
+//  Notify
+//
+//  Created by 黄穆斌 on 16/9/22.
+//  Copyright © 2016年 MuBinHuang. All rights reserved.
+//
+
+import Foundation
+
+// MARK: - Notify Name
+
+/// Notification Names
+extension Notify.Name {
+    /// Use in the network notifications.
+    static let network: Notification.Name = Notification.Name.init("myron.notify.name.network")
+    /// Use in the view operation notifications.
+    static let view : Notification.Name = Notification.Name.init("myron.notify.name.view")
+    /// Use in the model changed notifications.
+    static let model : Notification.Name = Notification.Name.init("myron.notify.name.model")
+    /// Use in other...
+    static let `default`: Notification.Name = Notification.Name.init("myron.notify.name.default")
+}
+
+// MAKR: - Protocol
+
+protocol NotifyProtocol { }
+extension NotifyProtocol {
+    
+    /// Observer notification.
+    func observer(selector: Selector, name: Notification.Name? = Notify.Name.default, object: Any? = nil) {
+        NotificationCenter.default.addObserver(self, selector: selector, name: name, object: object)
+    }
+    /// Remove observer notification.
+    func unobserver(name: Notification.Name? = nil, object: Any? = nil) {
+        NotificationCenter.default.removeObserver(self, name: name, object: object)
+    }
+    /// Post notification.
+    func post(name: Notification.Name, userInfo: [AnyHashable: Any]? = nil) {
+        NotificationCenter.default.post(name: name, object: self, userInfo: userInfo)
+    }
+    
+}
+
+// MARK: - Notify
+
+class Notify {
+    
+    struct Name { }
+    
+    // MARK: Property
+    
+    private let notification: Notification
+    /// Notification name.
+    var name: Notification.Name { return notification.name }
+    /// Notification post objest.
+    var object: Any? { return notification.object }
+    
+    /// userInfo[Notify.code], if nil will be -1000.
+    var code: Int
+    /// userInfo[Notify.code], if nil will be "Error: no message.".
+    var message: String
+    
+    // MARK: Init
+    
+    init(notify: Notification) {
+        self.notification = notify
+        code = (self.notification.userInfo?[Notify.code] as? Int) ?? -1000
+        message = (self.notification.userInfo?[Notify.message] as? String) ?? "Error: no message."
+    }
+    
+    // MARK: Analysis Methods
+    
+    /// Value for notification.userInfo with key.
+    subscript(key: AnyHashable) -> Any? {
+        return notification.userInfo?[key]
+    }
+    
+    /// Value for notification.userInfo with key, if nil will be null value.
+    func info<T>(_ key: AnyHashable, null: T) -> T {
+        if let value = notification.userInfo?[key] as? T {
+            return value
+        } else {
+            return null
+        }
+    }
+    
+    // MARK: Class Tool Methods
+    
+    static let code: String = "myron.notify.userinfo.code"
+    static let message: String = "myron.notify.userinfo.message"
+    
+    /// Create a userInfo message.
+    class func info(code: Int = -1000, message: String = "Error: no message.") -> [AnyHashable: Any] {
+        return [Notify.code: code, Notify.message: message]
+    }
+    
+}
+```
+
 # 总结
 
 Notification 的封装并不是什么难事，真正难的是如何灵活的运用好这种强大的特性。
 
-在我之后所写的代码中，通知中心将会非常
-
-
-
-
-
+在我之后所写的 Swift 3 类库中，通知中心将会被非常广泛的引用。所以这一篇文章也算是打基础。

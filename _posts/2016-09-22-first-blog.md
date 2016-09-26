@@ -2,7 +2,7 @@
 layout: page
 title: "First Blog"
 description: "Just talk."
-date: 2016-09-23
+date: 2016-09-22
 tags: [talk]
 comments: true
 share: true

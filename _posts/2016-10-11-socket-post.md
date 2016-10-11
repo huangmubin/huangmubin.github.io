@@ -10,6 +10,8 @@ share: true
 
 [C 语言中文网 Socket 教程](http://c.biancheng.net/cpp/html/3029.html)
 
+http://c.biancheng.net/cpp/html/3029.html
+
 # 关键词
 
 * IP 地址 (IP Address)
@@ -28,12 +30,19 @@ share: true
 
 # 创建 Socket
 
+
 1. 头文件 <sys/socket.h>
+
 2. int socket(int af, int type, int protocol)
+
 	2.1 Address Family: IP 地址类型 AF_INET (ipv4) / AF_INET6 (ipv6)
+
 	2.2 Type: 传输方式 SOCK_STREAM / SOCK_DERAM
+
 	2.3 Protocol: IPPROTO_TCP / IPPTOTO_UDP
+
 	2.4 示例
+	
 		2.4.1 `int tcp_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);`
 		2.4.2 `int udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);  `
 		2.4.3 `int tcp_socket = socket(AF_INET, SOCK_STREAM, 0);`
